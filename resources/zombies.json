@@ -1,0 +1,19 @@
+{
+	"zombie_weak": {
+		"health": 10,
+		"strength": 2,
+		"speed": 2
+	},
+	"zombie_regular": {
+
+	},
+	"zombie_warrior": {
+
+	},
+	"zombie_fast": {
+
+	},
+	"zombie_tank": {
+
+	}
+}

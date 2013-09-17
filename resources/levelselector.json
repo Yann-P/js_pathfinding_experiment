@@ -1,0 +1,17 @@
+{
+	"levels": {
+		"pyramid": [46, 114],
+		"oasis": [49, 240],
+		"cave": [270, 245],
+		"forest": [264, 63],
+		"village": [417, 113],
+		"tree": [432, 275],
+		"pine_forest": [586, 255],
+		"castle": [672, 100],
+		"snow_village": [897, 306],
+		"camp": [785, 500],
+		"tower": [560, 497],
+		"bridge": [350, 494],
+		"volcano": [192, 517]
+	}
+}

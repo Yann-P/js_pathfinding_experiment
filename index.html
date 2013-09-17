@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>Zombies</title>
+	<link rel='stylesheet' type='text/css' href='css/main.css'>
+</head>
+<body>
+	<div id='loading' class='view' data-view='loading'>
+		<h1>Chargement</h1>
+	</div>
+	<div id='menu' class='view' data-view='menu'>
+		<h1>Zombies</h1>
+		<button data-goto='level-selector'>Jouer</button>
+		<button data-goto='tutorial'>Tutoriel</button>
+
+	</div>
+	<div id='tutorial' class='view' data-view='tutorial'>
+		<button data-goto='menu'>Retour</button>
+	</div>
+	<div id='level-selector' class='view' data-view='level-selector'>
+		<button data-goto='menu'>Retour</button>
+	</div>
+	<div id='game' class='view' data-view='game'>
+
+	</div>
+	<script data-main='js/main' src='js/lib/require.js'></script>
+</body>
+</html>

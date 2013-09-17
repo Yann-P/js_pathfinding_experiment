@@ -1,0 +1,46 @@
+body {
+	font-family: arial;
+	background: #444;
+}
+
+.view {
+	position: relative;
+	display: none;
+	width: 928px;
+	height: 576px;
+	box-shadow: 0 0 3px black;
+	background: rgba(255, 255, 255, 0.4);
+}
+
+.view h1 {
+	margin: 0;
+}
+
+#level-selector {
+	background: url('../resources/img/worldmap.png');
+}
+
+#level-selector .level {
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	border: 1px solid rgba(255, 255, 255, 0.7);
+	border-radius: 25px;
+	font-size: 20px;
+	text-align: center;
+	color: rgba(0, 0, 0, 0);
+	text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.5);
+	box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+}
+
+#level-selector .level:hover {
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+}
+
+.entity {
+	position: absolute;
+	height: 32px;
+	width: 32px;
+}
