@@ -3,22 +3,36 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['lib/jquery', 'data', 'types', 'entity'], function($, Data, Types, Entity) {
+  define(['lib/jquery', 'data', 'entity'], function($, Data, Entity) {
     var Character;
     Character = (function(_super) {
 
       __extends(Character, _super);
 
       function Character(id, kind) {
-        Character.__super__.constructor.call(this, id, kind);
         this.moveStack = [];
-        this.orientation = Types.Directions.DOWN;
+        this.orientation = 'down';
+        Character.__super__.constructor.call(this, id, kind);
+        $(this.elt).addClass('character');
+        this.enableSmoothMvmt();
+        this.disableSmoothMvmt();
       }
 
       Character.prototype.setMoveStack = function(moveStack) {
         this.moveStack = moveStack;
         return this.nextMove();
       };
+
+      Character.prototype.move = function(x, y, callback) {
+        var _this = this;
+        this.setPosition(x, y);
+        return setTimeout(function() {
+          return callback();
+        }, 1000 / this.speed);
+      };
+
+      "teleport: (x, y) ->\n@disableSmoothMvmt()\n@setPosition(x, y)\n@enableSmoothMvmt()";
+
 
       Character.prototype.nextMove = function() {
         var dest, direction, source,
@@ -29,7 +43,6 @@
         source = this.moveStack[0];
         dest = this.moveStack[1];
         direction = null;
-        console.log(source);
         if (source[0] !== this.x || source[1] !== this.y) {
           throw "Source isn't current character position";
         }
@@ -37,13 +50,13 @@
           throw "There must be exactly one coordinate change between source and dest";
         }
         if (source[0] - dest[0] === -1) {
-          direction = Types.Directions.RIGHT;
+          direction = 'right';
         } else if (source[0] - dest[0] === 1) {
-          direction = Types.Directions.LEFT;
+          direction = 'left';
         } else if (source[1] - dest[1] === -1) {
-          direction = Types.Directions.DOWN;
+          direction = 'down';
         } else if (source[1] - dest[1] === 1) {
-          direction = Types.Directions.UP;
+          direction = 'up';
         } else {
           throw "Impossible move";
         }
@@ -61,24 +74,35 @@
           y: this.y
         };
         switch (direction) {
-          case Types.Directions.LEFT:
+          case 'left':
             pos.x--;
             break;
-          case Types.Directions.RIGHT:
+          case 'right':
             pos.x++;
             break;
-          case Types.Directions.UP:
+          case 'up':
             pos.y--;
             break;
-          case Types.Directions.DOWN:
+          case 'down':
             pos.y++;
         }
-        this.sprite.setAnimation("move_" + direction);
+        this.setAnimation("move_" + direction);
         this.orientation = direction;
-        return this.moveElt(pos.x, pos.y, function() {
-          _this.sprite.setAnimation("idle_" + direction);
+        return this.move(pos.x, pos.y, function() {
+          _this.setAnimation("idle_" + direction);
           return callback();
         });
+      };
+
+      Character.prototype.enableSmoothMvmt = function() {
+        this.elt.style.transitionProperty = 'top, left';
+        this.elt.style.transitionDuration = (1 / this.speed) + 's';
+        return this.elt.style.transitionTimingFunction = 'linear';
+      };
+
+      Character.prototype.disableSmoothMvmt = function() {
+        this.elt.style.transition = 'none';
+        return this.elt.style.transitionProperty = '';
       };
 
       return Character;

@@ -7,7 +7,7 @@
 
   window.app = null;
 
-  define(['lib/jquery', 'app', 'game'], function($, App, Game) {
+  define(['lib/jquery', 'app'], function($, App) {
     return $(function() {
       window.app = new App();
       app.center();
@@ -29,10 +29,10 @@
         });
       });
       return $('#level-selector').on('click', '.level', function() {
-        var level;
-        level = $(this).attr('data-level');
-        console.log("Chargement du niveau " + level);
-        return app.startGame(level);
+        var levelid;
+        levelid = $(this).attr('data-levelid');
+        console.log("Chargement du niveau " + levelid);
+        return app.startLevel(levelid);
       });
     });
   });

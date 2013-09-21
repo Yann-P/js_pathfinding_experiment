@@ -1,19 +1,19 @@
-define ['lib/jquery', 'data', 'game'], ($, Data, Game) ->
+define ['lib/jquery', 'data', 'level'], ($, Data, Level) ->
 
 	class App
 
 		constructor: ->
-			@currentGame = null
+			@currentLevel = null
 
 		load: (callback) ->
 			Data.load(callback)
 
 		initLevelSelector: ->
 			index = 1
-			for level, position of Data.store.levelselector.levels
+			for levelid, position of Data.store.levelselector.levels
 				$('<div></div>', {
 					'class': 'level', 
-					'data-level': level
+					'data-levelid': levelid
 				})
 				.text(index)
 				.css({
@@ -24,9 +24,9 @@ define ['lib/jquery', 'data', 'game'], ($, Data, Game) ->
 				index++
 			
 
-		startGame: (level) ->
-			game = new Game(level, @)
-			@currentGame = game
+		startLevel: (levelid) ->
+			level = new Level(levelid, @)
+			@currentLevel = level
 			@switchView('game')
 
 		center: ->
@@ -40,5 +40,3 @@ define ['lib/jquery', 'data', 'game'], ($, Data, Game) ->
 		switchView: (view) ->
 			$(".view").hide()
 			$(".view[data-view='#{view}']").show()
-
-	return App

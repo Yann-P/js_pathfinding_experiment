@@ -5,23 +5,22 @@
 
   define(['lib/jquery', 'data', 'character'], function($, Data, Character) {
     var Zombie;
-    Zombie = (function(_super) {
+    return Zombie = (function(_super) {
 
       __extends(Zombie, _super);
 
       function Zombie(id, kind) {
         var data;
-        Zombie.__super__.constructor.call(this, id, kind);
-        data = Data.store.zombies[this.kind];
-        this.health = data.heath;
+        data = Data.store.zombies[kind];
+        this.health = data.health;
         this.strength = data.strength;
         this.speed = data.speed;
+        Zombie.__super__.constructor.call(this, id, kind);
       }
 
       return Zombie;
 
     })(Character);
-    return Zombie;
   });
 
 }).call(this);

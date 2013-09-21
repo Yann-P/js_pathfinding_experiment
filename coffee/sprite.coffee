@@ -1,13 +1,9 @@
-define ['data'], (Data) ->
+define ['data', 'animation'], (Data, Animation) ->
 	class Sprite
 
 		constructor: (name, entity) ->
 			@name = name
 			@entity = entity
-			@currentAnimation = null
-			@currentAnimationTicks = 0
-			@currentAnimationTimeout = null
-
 			data = Data.store.sprites[@name]
 			@nbFramesWidth = data.nbFramesWidth
 			@frameWidth = data.width
@@ -20,22 +16,11 @@ define ['data'], (Data) ->
 		    y = Math.floor(id / @nbFramesWidth) * 32
 		    @entity.setBackground(@filepath, x, y)
 
-		setAnimation: (name) ->
-			@stopAnimation()
-			@currentAnimation = @animations[name]
-			@tickAnimation()
-
-		tickAnimation: ->
-			frames = @currentAnimation.frames
-			frameid = frames[@currentAnimationTicks % frames.length]
-			@setFrame(frameid)
-			@currentAnimationTicks++
-			@currentAnimationTimeout = setTimeout(=>
-				@tickAnimation()
-			, @currentAnimation.interval or 100)
-			
-		stopAnimation: ->
-			@currentAnimationTicks = 0
-			clearTimeout(@currentAnimationTimeout)
+		
+		createAnimations: ->
+			animations = {}
+			for name, data of @animations
+				animations[name] = new Animation(name, data.frames, data.interval, @)
+			return animations
 
 	return Sprite

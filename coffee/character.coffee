@@ -1,23 +1,37 @@
-define ['lib/jquery', 'data', 'types', 'entity'], ($, Data, Types, Entity) ->
+define ['lib/jquery', 'data', 'entity'], ($, Data, Entity) ->
 
 	class Character extends Entity
 
 		constructor: (id, kind) ->
-			super(id, kind)
 			@moveStack = []
-			@orientation = Types.Directions.DOWN
+			@orientation = 'down'
+			super(id, kind)
+
+			$(@elt).addClass('character')
+			@enableSmoothMvmt()
+			@disableSmoothMvmt()
 
 		setMoveStack: (moveStack) ->
 			@moveStack = moveStack
 			@nextMove()
+
+		move: (x, y, callback) ->
+			
+			@setPosition(x, y) # Pouqquoi remplacer setPos par teleport ne les fait pas bouger de manière saccadée ?! tester disableSmoothMvt
+			setTimeout( =>
+				callback()
+			, (1000 / @speed))
+
+		"""teleport: (x, y) ->
+			@disableSmoothMvmt()
+			@setPosition(x, y)
+			@enableSmoothMvmt()"""
 
 		nextMove: ->
 			return unless @moveStack.length > 1
 			source = @moveStack[0]
 			dest = @moveStack[1]
 			direction = null
-
-			console.log source
 			if source[0] != @x or source[1] != @y
 				throw "Source isn't current character position"
 
@@ -26,13 +40,13 @@ define ['lib/jquery', 'data', 'types', 'entity'], ($, Data, Types, Entity) ->
 
 			# Déplacement
 			if source[0] - dest[0] == -1
-				direction = Types.Directions.RIGHT # x+
+				direction = 'right' # x+
 			else if source[0] - dest[0] == 1
-			    direction = Types.Directions.LEFT # x-
+			    direction = 'left' # x-
 			else if source[1] - dest[1] == -1
-				direction = Types.Directions.DOWN # y+	
+				direction = 'down' # y+	
 			else if source[1] - dest[1] == 1
-				direction = Types.Directions.UP # y-
+				direction = 'up' # y-
 			else throw "Impossible move"
 
 			@moveTowards(direction, =>
@@ -43,20 +57,25 @@ define ['lib/jquery', 'data', 'types', 'entity'], ($, Data, Types, Entity) ->
 		moveTowards: (direction, callback) ->
 			pos = { x: @x, y: @y }
 			switch direction
-				when Types.Directions.LEFT
-					pos.x--
-				when Types.Directions.RIGHT
-					pos.x++
-				when Types.Directions.UP
-					pos.y--
-				when Types.Directions.DOWN
-					pos.y++
-			@sprite.setAnimation("move_#{direction}")
+				when 'left' 	then pos.x--
+				when 'right' 	then pos.x++
+				when 'up' 		then pos.y--
+				when 'down' 	then pos.y++
+			@setAnimation("move_#{direction}")
 			@orientation = direction
-			@moveElt(pos.x, pos.y, =>
-				@sprite.setAnimation("idle_#{direction}")
+			@move(pos.x, pos.y, =>
+				@setAnimation("idle_#{direction}")
 				callback()
 			)
+
+		enableSmoothMvmt: ->
+			@elt.style.transitionProperty = 'top, left'
+			@elt.style.transitionDuration = (1 / @speed) + 's'
+			@elt.style.transitionTimingFunction = 'linear'
+
+		disableSmoothMvmt: ->
+			@elt.style.transition = 'none'
+			@elt.style.transitionProperty = ''
 
 
 	return Character

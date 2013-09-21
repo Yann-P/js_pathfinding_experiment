@@ -39,7 +39,11 @@ body {
 	color: white;
 }
 
-.entity {
+#game {
+	background-size: 928px 576px;
+}
+
+#game .entity {
 	position: absolute;
 	height: 32px;
 	width: 32px;

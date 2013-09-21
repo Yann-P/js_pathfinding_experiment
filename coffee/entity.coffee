@@ -1,5 +1,4 @@
-
-define ['lib/jquery', 'data', 'sprite'], ($, Data, Sprite) ->
+define ['lib/jquery', 'data', 'sprite', 'animation'], ($, Data, Sprite, Animation) ->
 
 	class Entity
 
@@ -10,9 +9,11 @@ define ['lib/jquery', 'data', 'sprite'], ($, Data, Sprite) ->
 			@y = 0
 			@elt = null
 			@sprite = null
-
+			@currentAnimation = null
 			@sprite = new Sprite(@kind, @)
+			@animations = @sprite.createAnimations()
 			@createElt()
+			@setAnimation('idle_down')
 
 		createElt: ->
 			@elt = document.createElement('div')
@@ -20,32 +21,25 @@ define ['lib/jquery', 'data', 'sprite'], ($, Data, Sprite) ->
 
 		setBackground: (imagepath, x, y) ->
 			@elt.style.backgroundImage = "url('resources/img/#{imagepath}')"
-			@elt.style.backgroundPositionX = -x + 'px'
-			@elt.style.backgroundPositionY = -y + 'px'
+			@elt.style.backgroundPosition = (-x) + 'px ' + (-y) + 'px'
 
-		setPosition: (x, y, render) ->
+		setPosition: (x, y) ->
 			@x = x
 			@y = y
-			if render
-				@elt.style.left = @x * 32 + 'px'
-				@elt.style.top = @y * 32 + 'px'
+			@elt.style.left = (x * 32) + 'px'
+			@elt.style.top  = (y * 32) + 'px'
 
-		moveElt: (x, y, callback) ->
-			console.log('move')
-			$elt = $(@elt)
-			$elt.animate({
-				left: x * 32,
-				top: y * 32
-			}, 1000 / @speed, 'linear', =>
-				@setPosition(x, y, true)
-				callback()
-			)
+		setAnimation: (animationid) ->
+			animation = @animations[animationid]
+			if(@currentAnimation instanceof Animation)
+				@currentAnimation.stop()
+			@currentAnimation = animation
+			@currentAnimation.start()
 
+		remove: -> # À vérifier/compléter
+			@elt.remove()
+			delete @
 
-
-
-
-	return Entity
 
 
 

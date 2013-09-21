@@ -5,7 +5,7 @@ requirejs.config({
 
 window.app = null
 
-define ['lib/jquery', 'app', 'game'], ($, App, Game) ->
+define ['lib/jquery', 'app'], ($, App) ->
 		
 	$ ->
 		window.app = new App()
@@ -27,10 +27,10 @@ define ['lib/jquery', 'app', 'game'], ($, App, Game) ->
 				app.switchView(view)
 
 		$('#level-selector').on 'click', '.level', ->
-			level = $(this).attr('data-level')
-			console.log "Chargement du niveau #{level}"
+			levelid = $(this).attr('data-levelid')
+			console.log "Chargement du niveau #{levelid}"
 
-			app.startGame(level)
+			app.startLevel(levelid)
 			
 			
 		
