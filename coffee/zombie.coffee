@@ -4,7 +4,6 @@ define ['lib/jquery', 'data', 'character'], ($, Data, Character) ->
 		
 		constructor: (id, kind) ->
 			data = Data.store.zombies[kind]
-			@health = data.health
-			@strength = data.strength
-			@speed = data.speed
+			{ @health, @strength, @speed } = data
+			@maxHealth = @health
 			super(id, kind)

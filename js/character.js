@@ -3,67 +3,73 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define(['lib/jquery', 'data', 'entity'], function($, Data, Entity) {
+  define(['lib/jquery', 'utils', 'data', 'entity'], function($, Utils, Data, Entity) {
     var Character;
-    Character = (function(_super) {
+    return Character = (function(_super) {
 
       __extends(Character, _super);
 
       function Character(id, kind) {
         this.moveStack = [];
         this.orientation = 'down';
+        this.requestedPathCallback = null;
+        this.currentMoveTimeout = null;
+        this.mvmtInProgress = false;
         Character.__super__.constructor.call(this, id, kind);
-        $(this.elt).addClass('character');
-        this.enableSmoothMvmt();
-        this.disableSmoothMvmt();
+        this.setup();
       }
+
+      Character.prototype.setup = function() {
+        var healthBar;
+        this.healthBar = healthBar = document.createElement('div');
+        $(healthBar).addClass('health-bar');
+        return $(this.elt).addClass('character').append(healthBar);
+      };
+
+      Character.prototype.damage = function(hp) {
+        var _this = this;
+        this.health -= hp;
+        if (this.health <= 0) {
+          return this.die();
+        }
+        $(this.healthBar).css('background', 'white');
+        return setTimeout(function() {
+          return $(_this.healthBar).css({
+            background: 'red',
+            width: (_this.health / _this.maxHealth) * 32
+          });
+        }, 100);
+      };
+
+      Character.prototype.die = function() {
+        return this.onDeathCallback();
+      };
 
       Character.prototype.setMoveStack = function(moveStack) {
         this.moveStack = moveStack;
-        return this.nextMove();
+        if (!this.mvmtInProgress) {
+          return this._nextMove();
+        }
+      };
+
+      Character.prototype.abortMove = function() {
+        clearTimeout(this.currentMoveTimeout);
+        return this.moveStack = [];
       };
 
       Character.prototype.move = function(x, y, callback) {
         var _this = this;
+        this.damage(2);
         this.setPosition(x, y);
-        return setTimeout(function() {
+        return this.currentMoveTimeout = setTimeout(function() {
           return callback();
         }, 1000 / this.speed);
       };
 
-      "teleport: (x, y) ->\n@disableSmoothMvmt()\n@setPosition(x, y)\n@enableSmoothMvmt()";
-
-
-      Character.prototype.nextMove = function() {
-        var dest, direction, source,
-          _this = this;
-        if (!(this.moveStack.length > 1)) {
-          return;
-        }
-        source = this.moveStack[0];
-        dest = this.moveStack[1];
-        direction = null;
-        if (source[0] !== this.x || source[1] !== this.y) {
-          throw "Source isn't current character position";
-        }
-        if (Math.abs(source[0] - dest[0]) + Math.abs(source[1] - dest[1]) > 1) {
-          throw "There must be exactly one coordinate change between source and dest";
-        }
-        if (source[0] - dest[0] === -1) {
-          direction = 'right';
-        } else if (source[0] - dest[0] === 1) {
-          direction = 'left';
-        } else if (source[1] - dest[1] === -1) {
-          direction = 'down';
-        } else if (source[1] - dest[1] === 1) {
-          direction = 'up';
-        } else {
-          throw "Impossible move";
-        }
-        this.moveTowards(direction, function() {
-          return _this.nextMove();
-        });
-        return this.moveStack.splice(0, 1);
+      Character.prototype.moveTo = function(x, y) {
+        var path;
+        path = this.requestedPathCallback(x, y);
+        return this.setMoveStack(path);
       };
 
       Character.prototype.moveTowards = function(direction, callback) {
@@ -88,27 +94,77 @@
         }
         this.setAnimation("move_" + direction);
         this.orientation = direction;
+        this.mvmtInProgress = true;
         return this.move(pos.x, pos.y, function() {
-          _this.setAnimation("idle_" + direction);
+          _this.mvmtInProgress = false;
           return callback();
         });
       };
 
       Character.prototype.enableSmoothMvmt = function() {
-        this.elt.style.transitionProperty = 'top, left';
-        this.elt.style.transitionDuration = (1 / this.speed) + 's';
-        return this.elt.style.transitionTimingFunction = 'linear';
+        console.log("Transitions CSS3 activées");
+        $(this.elt).addClass('smooth-mvmt');
+        Utils.setTransitionDuration(this.elt, 1 / this.speed);
+        return window.getComputedStyle(this.elt).getPropertyValue("left");
       };
 
       Character.prototype.disableSmoothMvmt = function() {
-        this.elt.style.transition = 'none';
-        return this.elt.style.transitionProperty = '';
+        return $(this.elt).removeClass('smooth-mvmt');
+      };
+
+      Character.prototype.onRequestedPath = function(callback) {
+        return this.requestedPathCallback = callback;
+      };
+
+      Character.prototype.onDeath = function(callback) {
+        return this.onDeathCallback = callback;
+      };
+
+      Character.prototype.idle = function() {
+        return this.setAnimation("idle_" + this.orientation);
+      };
+
+      Character.prototype._nextMove = function() {
+        var dest, direction, source,
+          _this = this;
+        if (this.moveStack.length <= 1) {
+          return this.idle();
+        }
+        source = this.moveStack[0];
+        dest = this.moveStack[1];
+        direction = null;
+        if (source[0] !== this.x || source[1] !== this.y) {
+          throw "La source n'est pas la position actuelle du Character";
+        }
+        if (Math.abs(source[0] - dest[0]) + Math.abs(source[1] - dest[1]) > 1) {
+          throw "Il doit y avoir exactement une coordonnée changée de source à dest, x OU y";
+        }
+        if (source[0] - dest[0] === -1) {
+          direction = 'right';
+        } else if (source[0] - dest[0] === 1) {
+          direction = 'left';
+        } else if (source[1] - dest[1] === -1) {
+          direction = 'down';
+        } else if (source[1] - dest[1] === 1) {
+          direction = 'up';
+        } else {
+          throw "Mouvement inconnu";
+        }
+        this.moveTowards(direction, function() {
+          return _this._nextMove();
+        });
+        return this.moveStack.splice(0, 1);
+      };
+
+      Character.prototype.remove = function() {
+        console.log("Remove character");
+        this.abortMove();
+        return Entity.prototype.remove.call(this);
       };
 
       return Character;
 
     })(Entity);
-    return Character;
   });
 
 }).call(this);

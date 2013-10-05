@@ -1,12 +1,12 @@
 define ['data'], (Data) ->
 	class Animation
 		constructor: (name, frames, interval, sprite) ->
-			@name
+			@name = name
 			@sprite = sprite
 			@ticks = 0
 			@currentTimeout = null
 			@frames = frames
-			@interval = interval or 100
+			@interval = interval or 200
 
 		start: ->
 			@stop()
@@ -15,9 +15,10 @@ define ['data'], (Data) ->
 		tick: ->
 			frameid = @frames[@ticks++ % @frames.length]
 			@sprite.setFrame(frameid)
-			@currentTimeout = setTimeout(=>
-				@tick()
-			, @interval)
+			if @frames.length != 1
+				@currentTimeout = setTimeout(=>
+					@tick()
+				, @interval)
 			
 		stop: ->
 			@ticks = 0

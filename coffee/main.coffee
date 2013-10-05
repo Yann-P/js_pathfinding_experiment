@@ -8,6 +8,7 @@ window.app = null
 define ['lib/jquery', 'app'], ($, App) ->
 		
 	$ ->
+
 		window.app = new App()
 		
 		app.center()

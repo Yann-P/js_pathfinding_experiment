@@ -6,12 +6,12 @@
     Animation = (function() {
 
       function Animation(name, frames, interval, sprite) {
-        this.name;
+        this.name = name;
         this.sprite = sprite;
         this.ticks = 0;
         this.currentTimeout = null;
         this.frames = frames;
-        this.interval = interval || 100;
+        this.interval = interval || 200;
       }
 
       Animation.prototype.start = function() {
@@ -24,9 +24,11 @@
           _this = this;
         frameid = this.frames[this.ticks++ % this.frames.length];
         this.sprite.setFrame(frameid);
-        return this.currentTimeout = setTimeout(function() {
-          return _this.tick();
-        }, this.interval);
+        if (this.frames.length !== 1) {
+          return this.currentTimeout = setTimeout(function() {
+            return _this.tick();
+          }, this.interval);
+        }
       };
 
       Animation.prototype.stop = function() {

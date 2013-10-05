@@ -34,9 +34,9 @@
 
       App.prototype.startLevel = function(levelid) {
         var level;
+        this.switchView('game');
         level = new Level(levelid, this);
-        this.currentLevel = level;
-        return this.switchView('game');
+        return this.currentLevel = level;
       };
 
       App.prototype.center = function() {

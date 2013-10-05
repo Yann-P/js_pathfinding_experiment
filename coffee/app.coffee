@@ -22,18 +22,17 @@ define ['lib/jquery', 'data', 'level'], ($, Data, Level) ->
 				})
 				.appendTo('#level-selector')
 				index++
-			
 
 		startLevel: (levelid) ->
+			@switchView('game')
 			level = new Level(levelid, @)
 			@currentLevel = level
-			@switchView('game')
 
 		center: ->
 			top = window.innerHeight / 2 - 576 / 2
 			left = window.innerWidth / 2 - 928 / 2
 			$('.view').css({
-				top: if top < 0 then 0 else top
+				top:  if top < 0  then 0 else top
 				left: if left < 0 then 0 else left
 			})
 

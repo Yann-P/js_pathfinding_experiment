@@ -3,7 +3,7 @@
 
   define(['data', 'animation'], function(Data, Animation) {
     var Sprite;
-    Sprite = (function() {
+    return Sprite = (function() {
 
       function Sprite(name, entity) {
         var data;
@@ -38,7 +38,6 @@
       return Sprite;
 
     })();
-    return Sprite;
   });
 
 }).call(this);

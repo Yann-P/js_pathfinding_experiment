@@ -43,8 +43,35 @@ body {
 	background-size: 928px 576px;
 }
 
-#game .entity {
+.entity {
 	position: absolute;
 	height: 32px;
 	width: 32px;
+}
+
+.entity.character {
+
+}
+
+.smooth-mvmt {
+	transition-property: top, left;
+	transition-timing-function: linear;
+	transition-duration: 1s;
+	/*-moz-transition-property: top, left;
+	-moz-transition-timing-function: linear;
+	-webkit-transition-property: top, left;
+	-webkit-transition-timing-function: linear;
+	-o-transition-property: top, left;
+	-o-transition-timing-function: linear;*/
+}
+
+#game .entity.character .health-bar {
+	position: absolute;
+	left: 0;
+	top: -7px;
+	background: red;
+	height: 2px;
+	width: 32px;
+	opacity: 0.8;
+	box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 }

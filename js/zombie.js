@@ -12,9 +12,8 @@
       function Zombie(id, kind) {
         var data;
         data = Data.store.zombies[kind];
-        this.health = data.health;
-        this.strength = data.strength;
-        this.speed = data.speed;
+        this.health = data.health, this.strength = data.strength, this.speed = data.speed;
+        this.maxHealth = this.health;
         Zombie.__super__.constructor.call(this, id, kind);
       }
 

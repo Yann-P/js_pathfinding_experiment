@@ -16,11 +16,8 @@ define ['data', 'animation'], (Data, Animation) ->
 		    y = Math.floor(id / @nbFramesWidth) * 32
 		    @entity.setBackground(@filepath, x, y)
 
-		
 		createAnimations: ->
 			animations = {}
 			for name, data of @animations
 				animations[name] = new Animation(name, data.frames, data.interval, @)
 			return animations
-
-	return Sprite

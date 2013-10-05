@@ -3,7 +3,17 @@
 
   define([], function() {
     var Utils;
-    return Utils = {};
+    return Utils = {
+      getRandomElement: function(obj) {
+        return obj[Math.floor(Math.random() * obj.length)];
+      },
+      setTransitionDuration: function(elt, duration) {
+        elt.style.transitionDuration = duration + 's';
+        elt.style.WebkitTransitionDuration = duration + 's';
+        elt.style.MozTransitionDuration = duration + 's';
+        return elt.style.OTransitionDuration = duration + 's';
+      }
+    };
   });
 
 }).call(this);

@@ -1,59 +1,64 @@
-define ['lib/jquery', 'data', 'entity'], ($, Data, Entity) ->
+define ['lib/jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
 
 	class Character extends Entity
 
 		constructor: (id, kind) ->
 			@moveStack = []
 			@orientation = 'down'
+			@requestedPathCallback = null
+			@currentMoveTimeout = null
+			@mvmtInProgress = false
 			super(id, kind)
+			@setup() # Attention à ne pas écraser
 
-			$(@elt).addClass('character')
-			@enableSmoothMvmt()
-			@disableSmoothMvmt()
+		setup: ->
+			@healthBar = healthBar = document.createElement('div')
+			$(healthBar).addClass('health-bar')
+			$(@elt)
+				.addClass('character')
+				.append(healthBar)
+			
+		damage: (hp) ->
+			# Retitrer et vérifier si mort
+			@health -= hp
+			if @health <= 0
+				return @die()
+			# Animer et mettre à jour la taille de la healthBar
+			$(@healthBar).css('background', 'white')
+			setTimeout( =>
+				$(@healthBar).css({
+					background: 'red'
+					width: (@health / @maxHealth) * 32
+				})
+			, 100)
 
+		die: ->
+			@onDeathCallback()
+
+		# Définit une pile de mouvements à effectuer. Sous la forme [[y0, y0], [x1, y1], ...[xDest, yDest]] où x0 et y0 sont la pos actuelle
 		setMoveStack: (moveStack) ->
 			@moveStack = moveStack
-			@nextMove()
+			if not @mvmtInProgress
+				@_nextMove()
 
+		abortMove: ->
+			clearTimeout(@currentMoveTimeout)
+			@moveStack = []
+
+		# Effectue concrètement le passage d'une case à l'autre, avec un retard équivalent à la vitesse
 		move: (x, y, callback) ->
-			
-			@setPosition(x, y) # Pouqquoi remplacer setPos par teleport ne les fait pas bouger de manière saccadée ?! tester disableSmoothMvt
-			setTimeout( =>
+			@damage(2)
+			@setPosition(x, y)
+			@currentMoveTimeout = setTimeout( =>
 				callback()
 			, (1000 / @speed))
 
-		"""teleport: (x, y) ->
-			@disableSmoothMvmt()
-			@setPosition(x, y)
-			@enableSmoothMvmt()"""
+		# Aller à (x, y) en utilisant le pathfinder
+		moveTo: (x, y) ->
+			path = @requestedPathCallback(x, y)
+			@setMoveStack(path)
 
-		nextMove: ->
-			return unless @moveStack.length > 1
-			source = @moveStack[0]
-			dest = @moveStack[1]
-			direction = null
-			if source[0] != @x or source[1] != @y
-				throw "Source isn't current character position"
-
-			if Math.abs(source[0] - dest[0]) + Math.abs(source[1] - dest[1]) > 1
-				throw "There must be exactly one coordinate change between source and dest"
-
-			# Déplacement
-			if source[0] - dest[0] == -1
-				direction = 'right' # x+
-			else if source[0] - dest[0] == 1
-			    direction = 'left' # x-
-			else if source[1] - dest[1] == -1
-				direction = 'down' # y+	
-			else if source[1] - dest[1] == 1
-				direction = 'up' # y-
-			else throw "Impossible move"
-
-			@moveTowards(direction, =>
-				@nextMove()
-			)
-			@moveStack.splice(0, 1) # On enlève le 1er élément du moveStack
-
+		# Se déplacer dans une direction
 		moveTowards: (direction, callback) ->
 			pos = { x: @x, y: @y }
 			switch direction
@@ -61,21 +66,62 @@ define ['lib/jquery', 'data', 'entity'], ($, Data, Entity) ->
 				when 'right' 	then pos.x++
 				when 'up' 		then pos.y--
 				when 'down' 	then pos.y++
-			@setAnimation("move_#{direction}")
+
+			@setAnimation("move_#{direction}") 
 			@orientation = direction
+			@mvmtInProgress = true
+
 			@move(pos.x, pos.y, =>
-				@setAnimation("idle_#{direction}")
+				@mvmtInProgress = false
 				callback()
 			)
 
+		# Activer le mouvement fluide avec CSS3
 		enableSmoothMvmt: ->
-			@elt.style.transitionProperty = 'top, left'
-			@elt.style.transitionDuration = (1 / @speed) + 's'
-			@elt.style.transitionTimingFunction = 'linear'
+			console.log("Transitions CSS3 activées")
+			$(@elt).addClass('smooth-mvmt')
+			Utils.setTransitionDuration(@elt, 1 / @speed)
+			window.getComputedStyle(@elt).getPropertyValue("left");
 
 		disableSmoothMvmt: ->
-			@elt.style.transition = 'none'
-			@elt.style.transitionProperty = ''
+			$(@elt).removeClass('smooth-mvmt')
 
+		onRequestedPath: (callback) ->
+			@requestedPathCallback = callback
 
-	return Character
+		onDeath: (callback) ->
+			@onDeathCallback = callback
+
+		idle: ->
+		    @setAnimation("idle_#{@orientation}")
+
+		# Exécute un mouvement du moveStack.
+		_nextMove: ->
+			if @moveStack.length <= 1 # Plus aucun déplacement à faire, on passe en idle et on quitte
+				return @idle()
+
+			source = @moveStack[0]
+			dest = @moveStack[1]
+			direction = null
+			if source[0] != @x or source[1] != @y
+				throw "La source n'est pas la position actuelle du Character"
+
+			if Math.abs(source[0] - dest[0]) + Math.abs(source[1] - dest[1]) > 1
+				throw "Il doit y avoir exactement une coordonnée changée de source à dest, x OU y"
+
+			# Déduire la direction entre la source et la destination
+			if 		source[0] - dest[0] == -1 	then direction = 'right' # x+
+			else if source[0] - dest[0] ==  1 	then direction = 'left' # x-
+			else if source[1] - dest[1] == -1   then direction = 'down' # y+	
+			else if source[1] - dest[1] ==  1   then direction = 'up' # y-
+			else throw "Mouvement inconnu"
+
+			@moveTowards(direction, =>
+				@_nextMove()
+			)
+			@moveStack.splice(0, 1) # On enlève le 1er élément du moveStack
+
+		remove: -> # Écrase le remove() de Entity, qu'on appelle avec un .call() sur le prototype d'Entity
+			console.log "Remove character"
+			@abortMove()
+			Entity.prototype.remove.call(@) # Parent::remove()

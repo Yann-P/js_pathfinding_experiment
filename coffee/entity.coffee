@@ -1,4 +1,4 @@
-define ['lib/jquery', 'data', 'sprite', 'animation'], ($, Data, Sprite, Animation) ->
+define ['lib/jquery', 'data', 'sprite', 'animation', 'character'], ($, Data, Sprite, Animation, Character) ->
 
 	class Entity
 
@@ -16,8 +16,9 @@ define ['lib/jquery', 'data', 'sprite', 'animation'], ($, Data, Sprite, Animatio
 			@setAnimation('idle_down')
 
 		createElt: ->
-			@elt = document.createElement('div')
-			$(@elt).addClass('entity').appendTo('#game')
+			elt = document.createElement('div')
+			$(elt).addClass('entity').appendTo('#game')
+			return @elt = elt
 
 		setBackground: (imagepath, x, y) ->
 			@elt.style.backgroundImage = "url('resources/img/#{imagepath}')"
@@ -30,17 +31,19 @@ define ['lib/jquery', 'data', 'sprite', 'animation'], ($, Data, Sprite, Animatio
 			@elt.style.top  = (y * 32) + 'px'
 
 		setAnimation: (animationid) ->
-			animation = @animations[animationid]
-			if(@currentAnimation instanceof Animation)
+			if @currentAnimation && @currentAnimation.name == animationid # Si la même animation n'est pas déjà en cours
+				return
+			animation = @animations[animationid] or throw "Cette entité n'a pas d'animation #{animationid}"
+			if @currentAnimation
 				@currentAnimation.stop()
 			@currentAnimation = animation
 			@currentAnimation.start()
 
-		remove: -> # À vérifier/compléter
+		clearAnimation: ->
+			if @currentAnimation
+				@currentAnimation.stop()
+
+		remove: ->
+			console.log "Remove entity"
+			@clearAnimation()
 			@elt.remove()
-			delete @
-
-
-
-
-
