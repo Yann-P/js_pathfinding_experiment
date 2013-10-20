@@ -5,21 +5,33 @@
 		"waves": [
 			{
 				"zombies": {
-					"zombie_weak": 10,
-					"zombie_regular": 0
+					"zombie_1": 0
 				},
-				"interval": 0.1,
-				"next": 10
+				"interval": 2000000,
+				"next": 320000
 			},
 			{
 				"zombies": {
-					"zombie_fast": 30,
-					"zombie_weak": 2
+					"zombie_2": 20
 				},
-				"interval": 0.5
+				"interval": 1
 			}
 		],
-		"gold": 300
+		"gold": 300,
+		"initialTowers": [
+			{
+				"x": 10,
+				"y": 3,
+				"kind": "tower_small",
+				"upgradeLevel": 0
+			},
+			{
+				"x": 20,
+				"y": 5,
+				"kind": "tower_small",
+				"upgradeLevel": 2
+			}
+		]
 	},
 	"oasis": {
 		"name": "pyramid"

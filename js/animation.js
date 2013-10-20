@@ -3,7 +3,7 @@
 
   define(['data'], function(Data) {
     var Animation;
-    Animation = (function() {
+    return Animation = (function() {
 
       function Animation(name, frames, interval, sprite) {
         this.name = name;
@@ -14,7 +14,9 @@
         this.interval = interval || 200;
       }
 
-      Animation.prototype.start = function() {
+      Animation.prototype.start = function(nbLoops, callback) {
+        this.nbLoops = nbLoops;
+        this.callback = callback;
         this.stop();
         return this.tick();
       };
@@ -24,11 +26,18 @@
           _this = this;
         frameid = this.frames[this.ticks++ % this.frames.length];
         this.sprite.setFrame(frameid);
-        if (this.frames.length !== 1) {
-          return this.currentTimeout = setTimeout(function() {
-            return _this.tick();
-          }, this.interval);
+        if (this.frames.length === 1) {
+          return this.stop();
         }
+        if ((this.nbLoops != null) && this.ticks === this.nbLoops * this.frames.length) {
+          if (this.callback) {
+            this.callback();
+          }
+          return this.stop();
+        }
+        return this.currentTimeout = setTimeout(function() {
+          return _this.tick();
+        }, this.interval);
       };
 
       Animation.prototype.stop = function() {
@@ -39,7 +48,6 @@
       return Animation;
 
     })();
-    return Animation;
   });
 
 }).call(this);

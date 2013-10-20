@@ -1,0 +1,19 @@
+{
+	"tower_small": {
+		"health": 1000,
+		"resistance": 0,
+		"width": 5,
+		"height": 4,
+		"villagers": {
+			"villager_1": 4,
+			"villager_2": 50,
+			"villager_3": 4
+		},
+		"door": {
+			"spriteid": "door_1",
+			"x": 2, 
+			"y": 3
+		}
+
+	}
+}

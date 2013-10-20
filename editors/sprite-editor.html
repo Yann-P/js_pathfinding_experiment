@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sprite Editor</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="../css/lib/bootstrap.css">
+	<style type="text/css">
+		#preview {
+			position: relative;
+		}
+		.frame {
+			position: absolute;
+			border: 1px solid red;
+		}
+	</style>
+	<script type="text/javascript" src="../js/lib/jquery.js"></script>
+	<script type="text/javascript" src="sprite-editor-2.js"></script>
+</head>
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+        	<div class="container-fluid">
+          		<a class="brand" href="#">Éditeur de sprites</a>
+          		<div class="nav-collapse collapse" style="float:right">
+            		<ul class="nav">
+              			<li> <a href="#" id="import">Importer une feuille de sprites</a> </li>
+              			<li> <a href="#" id="export">Exporter en JSON</a> </li>
+            		</ul>
+          		</div>
+        	</div>
+        </div>
+    </div>
+
+    <div class="container-fluid" style="margin-top: 60px">
+
+		<div class="row-fluid">
+			<div class="span2">
+				<h3>Sprites <button class="btn btn-success" id="new-sprite">+</button></h3>
+				<ul class="nav nav-pills nav-stacked" id="sprite-list">
+					
+				</ul>
+			</div>
+			<div class="span5">
+				<h3>Nouveau sprite</h3>
+				<div class="view" data-view="sprite-creation">
+					<form class="form-horizontal" id="create-sprite">
+						<div class="control-group">
+							<label class="control-label">Nom du sprite</label>
+							<div class="controls">
+								<input type="text" name="sprite-name"  value="zombie_ogre" required pattern="^[a-z_]{3,30}$">
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label">Ressource graphique</label>
+							<div class="controls">
+								<div class="input-prepend">
+								  	<span class="add-on" id="resources-path">resources/img/sprites/</span>
+								  	<input name="sprite-image" value="zombie_ogre.png" required type="text">
+								</div>
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="controls">
+								<input type="submit" class="btn btn-primary" id="test-sprite-image" value="Tester l'image du sprite avant de continuer">
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label">Dimensions sprite calculées</label>
+							<div class="controls">
+								<input type="text" class="input-small" name="sprite-width" disabled>px par <input type="text" class="input-small" name="sprite-height" disabled>px
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label">Dimensions d'une frame</label>
+							<div class="controls">
+								<input type="text" class="input-small" name="frame-width">px par <input type="text" class="input-small" name="frame-height">px
+							</div>
+						</div>
+						<div class="control-group">
+							<div class="controls">
+								<input type="submit" class="btn btn-large btn-primary" value="Ajouter le sprite">
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<div class="view" data-view="sprite-edition">
+					
+
+
+				</div>
+			</div>
+			<div class="span5">
+				<h3>Apercu</h3>
+				<div id="preview"></div>
+			</div>
+		</div>
+
+    </div>
+</body>
+</html>

@@ -1,36 +1,33 @@
 define [], ->
 
+	## Revoir sructure
 	window.Data = {
 
 		store: {}
 
-		files: [
-			'sprites'
-			'levels'
-			'levelselector'
-			'zombies'
-		]
-
-		preload: [
-			# À faire
-		]
-
 		load: (callback) ->
-			@getFiles(=>
-				@preloadImages(callback)
-			)
-			
+			$.ajax({
+				dataType: "json"
+				url: "resources/setup.json"
+				cache: false
+				success: (data) =>
+					@getFiles(data.load.json, =>
+						@preloadImages(callback)
+					)
+				error: =>
+					throw "Cannot load setup.json."
+			})
 
 		loadImageInCache: (url, callback) ->
 			image = new Image()
 			image.onload = callback
 			image.src = url
 
-		preloadImages: (callback) -> # À faire
+		preloadImages: (callback) -> ## À faire
 			callback()
 
-		getFiles: (callback, index = 0) -> # Récursive
-			file = @files[index]
+		getFiles: (files, callback, index = 0) -> # Récursive
+			file = files[index]
 			url = "resources/#{file}.json"
 
 			$.ajax({
@@ -39,12 +36,12 @@ define [], ->
 				cache: false
 				success: (data) =>
 					@store[file] = data
-					if index is @files.length - 1 # Dernier truc à charger
+					if index is files.length - 1 # Dernier truc à charger
 						callback()
 					else
-						@getFiles(callback, index + 1)
+						@getFiles(files, callback, index + 1)
 				error: =>
-					console.log("Error loading JSON")
+					throw "Error loading JSON"
 			})
 	}
 

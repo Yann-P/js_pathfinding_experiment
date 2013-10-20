@@ -1,4 +1,4 @@
-define ['lib/jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
+define ['jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
 
 	class Character extends Entity
 
@@ -8,8 +8,10 @@ define ['lib/jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
 			@requestedPathCallback = null
 			@currentMoveTimeout = null
 			@mvmtInProgress = false
+			@target = null
+			@attackers = {}
 			super(id, kind)
-			@setup() # Attention à ne pas écraser
+			@setup() ## Attention à ne pas écraser
 
 		setup: ->
 			@healthBar = healthBar = document.createElement('div')
@@ -17,18 +19,54 @@ define ['lib/jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
 			$(@elt)
 				.addClass('character')
 				.append(healthBar)
+			@setAnimation('idle_down')
+
+		follow: (character) ->
+			@moveTo(character.x, character.y)
+
+		setTarget: (character) ->
+			if @target
+				@removeTarget()
+			@target = character
+
+		removeTarget: ->
+			@target = null
+			@abortMove()
+
+		addAttacker: (character) ->
+			console.log @attackers
+			if !(character.id in @attackers)
+				@attackers[character.id] = character
+			else throw 'Déjà attaqué par ce personnage'
+
+		removeAttacker: (character) ->
+			if character.id in @attackers
+				delete @attackers[character.id]
+			else throw 'Pas attaqué par ce personnage'
 			
+		forEachAttacker: (callback) ->
+			for id of @attackers
+				callback(@attackers[id])
+
 		damage: (hp) ->
-			# Retitrer et vérifier si mort
 			@health -= hp
 			if @health <= 0
+				@hp = 0
 				return @die()
-			# Animer et mettre à jour la taille de la healthBar
+			@updateHealthBar()
+
+		heal: (hp) ->
+			@health += hp
+			if @health > @maxHealth
+				@health = @maxHealth
+			@updateHealthBar()
+
+		updateHealthBar: ->
 			$(@healthBar).css('background', 'white')
 			setTimeout( =>
 				$(@healthBar).css({
 					background: 'red'
-					width: (@health / @maxHealth) * 32
+					width: (@health / @maxHealth) * 30
 				})
 			, 100)
 
@@ -47,10 +85,11 @@ define ['lib/jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
 
 		# Effectue concrètement le passage d'une case à l'autre, avec un retard équivalent à la vitesse
 		move: (x, y, callback) ->
-			@damage(2)
+			@stepCallback()
 			@setPosition(x, y)
 			@currentMoveTimeout = setTimeout( =>
 				callback()
+				
 			, (1000 / @speed))
 
 		# Aller à (x, y) en utilisant le pathfinder
@@ -78,7 +117,6 @@ define ['lib/jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
 
 		# Activer le mouvement fluide avec CSS3
 		enableSmoothMvmt: ->
-			console.log("Transitions CSS3 activées")
 			$(@elt).addClass('smooth-mvmt')
 			Utils.setTransitionDuration(@elt, 1 / @speed)
 			window.getComputedStyle(@elt).getPropertyValue("left");
@@ -88,6 +126,9 @@ define ['lib/jquery', 'utils', 'data', 'entity'], ($, Utils, Data, Entity) ->
 
 		onRequestedPath: (callback) ->
 			@requestedPathCallback = callback
+
+		onStep: (callback) ->
+			@stepCallback = callback
 
 		onDeath: (callback) ->
 			@onDeathCallback = callback

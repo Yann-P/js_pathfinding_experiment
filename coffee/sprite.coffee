@@ -4,7 +4,7 @@ define ['data', 'animation'], (Data, Animation) ->
 		constructor: (name, entity) ->
 			@name = name
 			@entity = entity
-			data = Data.store.sprites[@name]
+			data = Data.store.sprites[@name] or throw "Sprite '#{name}' inexistant"
 			@nbFramesWidth = data.nbFramesWidth
 			@frameWidth = data.width
 			@frameHeight = data.height
@@ -12,8 +12,8 @@ define ['data', 'animation'], (Data, Animation) ->
 			@animations = data.animations
 
 		setFrame: (id) ->
-		    x = (id % @nbFramesWidth) * 32
-		    y = Math.floor(id / @nbFramesWidth) * 32
+		    x = (id % @nbFramesWidth) * @frameWidth
+		    y = Math.floor(id / @nbFramesWidth) * @frameHeight
 		    @entity.setBackground(@filepath, x, y)
 
 		createAnimations: ->

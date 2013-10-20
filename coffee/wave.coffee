@@ -11,6 +11,7 @@ define [], () ->
 			@nextZombieTimeout = null
 			@callback = null
 
+		# Lancer une vague
 		start: (callback) ->
 			@callback = callback
 			@stack = [] 					   # Liste de zombies à spawner
@@ -20,18 +21,19 @@ define [], () ->
 			console.log("Vague ##{@id} commencée (#{@stack.length} zombies)")
 			@tick()
 
-		# Envoyer le prochain zombie. Braiiiiiins
+		# Envoyer le prochain zombie.
 		tick: ->
-			zombie = @level.addZombie(14, 17, @stack[0])
-			zombie.moveTo(Math.floor(Math.random() * 29), Math.floor(Math.random() * 18))
-
-			@stack.splice(0, 1) 		# On enlève le zombie de la liste à spawner
 			if @stack.length == 0 		# Si c'est fini pour cette vague
 				console.log("Vague ##{@id} terminée. #{@next}s avant prochaine")
 				return setTimeout( =>
 					console.log("Temps écoulé")
 					@callback()
 				, @next * 1000)
+
+			zombie = @level.addZombie(14, 17, @stack[0])
+			zombie.moveTo(Math.floor(Math.random() * 29), Math.floor(Math.random() * 18))
+			@stack.splice(0, 1) 		# On enlève le zombie de la liste à spawner
+
 			@nextZombieTimeout = setTimeout( =>
 				@tick()
 			, @interval * 1000)

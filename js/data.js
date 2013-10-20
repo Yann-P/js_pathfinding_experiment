@@ -4,12 +4,20 @@
   define([], function() {
     window.Data = {
       store: {},
-      files: ['sprites', 'levels', 'levelselector', 'zombies'],
-      preload: [],
       load: function(callback) {
         var _this = this;
-        return this.getFiles(function() {
-          return _this.preloadImages(callback);
+        return $.ajax({
+          dataType: "json",
+          url: "resources/setup.json",
+          cache: false,
+          success: function(data) {
+            return _this.getFiles(data.load.json, function() {
+              return _this.preloadImages(callback);
+            });
+          },
+          error: function() {
+            throw "Cannot load setup.json.";
+          }
         });
       },
       loadImageInCache: function(url, callback) {
@@ -21,13 +29,13 @@
       preloadImages: function(callback) {
         return callback();
       },
-      getFiles: function(callback, index) {
+      getFiles: function(files, callback, index) {
         var file, url,
           _this = this;
         if (index == null) {
           index = 0;
         }
-        file = this.files[index];
+        file = files[index];
         url = "resources/" + file + ".json";
         return $.ajax({
           dataType: "json",
@@ -35,14 +43,14 @@
           cache: false,
           success: function(data) {
             _this.store[file] = data;
-            if (index === _this.files.length - 1) {
+            if (index === files.length - 1) {
               return callback();
             } else {
-              return _this.getFiles(callback, index + 1);
+              return _this.getFiles(files, callback, index + 1);
             }
           },
           error: function() {
-            return console.log("Error loading JSON");
+            throw "Error loading JSON";
           }
         });
       }

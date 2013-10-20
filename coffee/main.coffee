@@ -1,16 +1,24 @@
 # Évite les problèmes de cache
-requirejs.config({
-	urlArgs: 'v=' + Date.now()
+require.config({
+	urlArgs: "v=" +  Date.now()
+	paths: {
+		## Ne marche pas en local :(
+        'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
+        'astar': 'http://yann-p.fr/zombies/js/lib/astar' 
+    }
+    shim: {
+        'jquery': { exports: '$' },
+        'astar': { exports: 'AStar' }
+    }
 })
 
 window.app = null
 
-define ['lib/jquery', 'app'], ($, App) ->
-		
+define ['jquery', 'app'], ($, App) ->
+
 	$ ->
 
-		window.app = new App()
-		
+		app = new App()
 		app.center()
 		app.switchView('loading')
 

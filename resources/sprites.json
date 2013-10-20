@@ -1,5 +1,5 @@
 {
-	"zombie_weak": {
+	"zombie_1": {
 		"nbFramesWidth": 12,
 		"width": 32,
 		"height": 32,
@@ -16,7 +16,7 @@
 		}
 	},
 
-	"zombie_regular": {
+	"zombie_2": {
 		"nbFramesWidth": 12,
 		"width": 32,
 		"height": 32,
@@ -33,20 +33,91 @@
 		}
 	},
 
-	"zombie_fast": {
+	"villager_1": {
 		"nbFramesWidth": 12,
 		"width": 32,
 		"height": 32,
-		"filepath": "zombiesA.png",
+		"filepath": "villagersA.png",
+		"animations": {
+			"idle_up": 		{ "frames": [37] },
+			"idle_right": 	{ "frames": [25] },
+			"idle_left": 	{ "frames": [13] },
+			"idle_down": 	{ "frames": [1] },
+			"move_up": 		{ "frames": [36, 37, 38] },
+			"move_right": 	{ "frames": [24, 25, 26] },
+			"move_left": 	{ "frames": [12, 13, 14] },
+			"move_down": 	{ "frames": [0, 1, 2] }
+		}
+	},
+
+	"villager_2": {
+		"nbFramesWidth": 12,
+		"width": 32,
+		"height": 32,
+		"filepath": "villagersA.png",
+		"animations": {
+			"idle_up": 		{ "frames": [40] },
+			"idle_right": 	{ "frames": [28] },
+			"idle_left": 	{ "frames": [16] },
+			"idle_down": 	{ "frames": [4] },
+			"move_up": 		{ "frames": [39, 40, 41] },
+			"move_right": 	{ "frames": [27, 28, 29] },
+			"move_left": 	{ "frames": [15, 16, 17] },
+			"move_down": 	{ "frames": [3, 4, 5] }
+		}
+	},
+
+	"villager_3": {
+		"nbFramesWidth": 12,
+		"width": 32,
+		"height": 32,
+		"filepath": "villagersA.png",
 		"animations": {
 			"idle_up": 		{ "frames": [46] },
 			"idle_right": 	{ "frames": [34] },
 			"idle_left": 	{ "frames": [22] },
 			"idle_down": 	{ "frames": [10] },
-			"move_up": 		{ "frames": [45, 46, 47, 46] },
-			"move_right": 	{ "frames": [33, 34, 35, 34] },
-			"move_left": 	{ "frames": [21, 22, 23, 22] },
-			"move_down": 	{ "frames": [9, 10, 11, 10] }
+			"move_up": 		{ "frames": [45, 46, 47] },
+			"move_right": 	{ "frames": [33, 34, 35] },
+			"move_left": 	{ "frames": [21, 22, 23] },
+			"move_down": 	{ "frames": [9, 10, 11] }
+		}
+	},
+
+	"effect_attack2": {
+		"nbFramesWidth": 5,
+		"width": 192,
+		"height": 192,
+		"filepath": "effects/attack2.png",
+		"animations": {
+			"default": 	{ "frames": [0, 1, 2, 3, 4, 5, 6, 7], "interval": 60 }
+		}
+	},
+
+	"tower_small": {
+		"nbFramesWidth": 3,
+		"width": 160,
+		"height": 128,
+		"filepath": "tower_small.png",
+		"animations": {
+			"upgrade_0": 	{ "frames": [0] },
+			"upgrade_1": 	{ "frames": [1] },
+			"upgrade_2": 	{ "frames": [2] },
+			"upgrade_3": 	{ "frames": [3] }
+		}
+	},
+
+	"door_1": {
+		"nbFramesWidth": 3,
+		"width": 32,
+		"height": 32,
+		"filepath": "doors/door_1.png",
+		"animations": {
+			"closed": 	{ "frames": [0] },
+			"opening": 	{ "frames": [3, 6, 9], "interval": 60 },
+			"open": 	{ "frames": [9] },
+			"closing": 	{ "frames": [6, 3, 0], "interval": 60 }
 		}
 	}
+
 }

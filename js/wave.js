@@ -33,9 +33,6 @@
       Wave.prototype.tick = function() {
         var zombie,
           _this = this;
-        zombie = this.level.addZombie(14, 17, this.stack[0]);
-        zombie.moveTo(Math.floor(Math.random() * 29), Math.floor(Math.random() * 18));
-        this.stack.splice(0, 1);
         if (this.stack.length === 0) {
           console.log("Vague #" + this.id + " terminée. " + this.next + "s avant prochaine");
           return setTimeout(function() {
@@ -43,6 +40,9 @@
             return _this.callback();
           }, this.next * 1000);
         }
+        zombie = this.level.addZombie(14, 17, this.stack[0]);
+        zombie.moveTo(Math.floor(Math.random() * 29), Math.floor(Math.random() * 18));
+        this.stack.splice(0, 1);
         return this.nextZombieTimeout = setTimeout(function() {
           return _this.tick();
         }, this.interval * 1000);

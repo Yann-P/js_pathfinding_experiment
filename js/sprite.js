@@ -9,7 +9,9 @@
         var data;
         this.name = name;
         this.entity = entity;
-        data = Data.store.sprites[this.name];
+        data = Data.store.sprites[this.name] || (function() {
+          throw "Sprite '" + name + "' inexistant";
+        })();
         this.nbFramesWidth = data.nbFramesWidth;
         this.frameWidth = data.width;
         this.frameHeight = data.height;
@@ -19,8 +21,8 @@
 
       Sprite.prototype.setFrame = function(id) {
         var x, y;
-        x = (id % this.nbFramesWidth) * 32;
-        y = Math.floor(id / this.nbFramesWidth) * 32;
+        x = (id % this.nbFramesWidth) * this.frameWidth;
+        y = Math.floor(id / this.nbFramesWidth) * this.frameHeight;
         return this.entity.setBackground(this.filepath, x, y);
       };
 

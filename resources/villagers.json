@@ -1,0 +1,26 @@
+{
+	"villager_1": {
+		"type": "attacker",
+		"health": 10,
+		"strength": 2,
+		"resistance": 2,
+		"speed": 3
+	},
+
+	"villager_2": {
+		"type": "defender",
+		"health": 20,
+		"strength": 8,
+		"resistance": 8,
+		"speed": 4.5
+	},
+	
+	"villager_3": {
+		"type": "miner",
+		"health": 20,
+		"strength": 8,
+		"resistance": 8,
+		"speed": 4.5
+	}
+
+}
