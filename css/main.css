@@ -63,6 +63,7 @@ body {
 }
 
 #game .entity.character .health-bar {
+	z-index: 20;
 	position: absolute;
 	left: 1px;
 	top: -7px;

@@ -3,8 +3,8 @@ require.config({
 	urlArgs: "v=" +  Date.now()
 	paths: {
 		## Ne marche pas en local :(
-        'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
-        'astar': 'http://yann-p.fr/zombies/js/lib/astar' 
+        'jquery': '/zombies/js/lib/jquery', # http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min
+        'astar': '/zombies/js/lib/astar' # http://yann-p.fr/zombies/js/lib/astar
     }
     shim: {
         'jquery': { exports: '$' },
@@ -18,7 +18,7 @@ define ['jquery', 'app'], ($, App) ->
 
 	$ ->
 
-		app = new App()
+		window.app = new App()
 		app.center()
 		app.switchView('loading')
 

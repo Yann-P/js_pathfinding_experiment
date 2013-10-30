@@ -6,6 +6,7 @@
     Level = (function() {
 
       function Level(id, app) {
+        var v1;
         this.id = id;
         this.app = app;
         this.entityCount = 0;
@@ -14,6 +15,8 @@
         this.waves = [];
         this.map = new Map();
         this.setup();
+        v1 = this.addVillager(5, 1, 'villager_1');
+        v1.moveTo(18, 1);
       }
 
       Level.prototype.setup = function() {
@@ -22,7 +25,7 @@
           throw "Données manquantes pour level #" + this.id;
         }).call(this);
         this.name = data.name, this.gold = data.gold, this.blocking = data.blocking, this.initialTowers = data.initialTowers;
-        $('#game').css('backgroundImage', "url('resources/img/maps/" + this.name + ".png')");
+        $('#game').css('background', "lightyellow");
         this.wavesData = data.waves;
         this.addWaves();
         this.map.setBlockingGrid(this.blocking);
@@ -101,7 +104,7 @@
       };
 
       Level.prototype.addTower = function(x, y, kind) {
-        var amount, door, i, tower, type, _i, _ref,
+        var amount, door, i, tower, tvill, type, _i, _ref,
           _this = this;
         tower = new Tower(this.entityCount++, kind);
         tower.setPosition(x, y);
@@ -116,7 +119,9 @@
         for (type in _ref) {
           amount = _ref[type];
           for (i = _i = 0; 0 <= amount ? _i < amount : _i > amount; i = 0 <= amount ? ++_i : --_i) {
-            this.addVillager(door.x, door.y, type);
+            tvill = this.addVillager(door.x, door.y, type);
+            console.log(tvill.x + ' ' + tvill.y);
+            tvill.moveTo(0, 0);
           }
         }
         return tower;
@@ -128,17 +133,44 @@
         this.entities[character.id] = character;
         character.enableSmoothMvmt();
         if (!this.map.isTileFree(character.x, character.y)) {
+          console.log("Un personnage a spawné dans un mur");
           pos = this.map.getNearestFreeTile(character.x, character.y);
           character.setPosition(pos[0], pos[1]);
         }
         this.map.addBlockingItem(character.x, character.y);
-        character.onStep(function() {
-          return character.forEachAttacker(function(attacker) {
+        character.onBeforeNextStep(function(nextX, nextY) {
+          var coord, _i, _len, _ref, _results;
+          console.log("$ beforeNextStep : actuellement en (" + character.x + ", " + character.y + "), prochaine case (" + nextX + ", " + nextY + ")");
+          if (!_this.map.isTileFree(nextX, nextY)) {
+            console.log("# Bloqué à (" + character.x + ", " + character.y + "), ne peut pas se rendre en (" + nextX + ", " + nextY + ")");
+            character.abortMove();
+            console.log("#######");
+            character.moveTo(18, 1);
+          }
+          Utils.removeDebugEntities('path' + character.id);
+          _ref = character.moveStack;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            coord = _ref[_i];
+            _results.push(Utils.createDebugEntity(coord[0], coord[1], 'blue', -1, 'path' + character.id));
+          }
+          return _results;
+        });
+        character.onStep(function(prevX, prevY) {
+          _this.map.removeBlockingItem(prevX, prevY);
+          _this.map.addBlockingItem(character.x, character.y);
+          console.log("$ step : passage de (" + prevX + ", " + prevY + ") à (" + character.x + ", " + character.y + ")");
+          character.forEachAttacker(function(attacker) {
             return attacker.follow(character);
           });
+          if (character.x === 6) {
+            return _this.map.addBlockingItem(character.x + 2, character.y);
+          }
         });
         character.onRequestedPath(function(x, y) {
-          return _this.findPath(character, x, y);
+          var path;
+          path = _this.findPath(character, x, y);
+          return path;
         });
         return character.onDeath(function() {
           return _this.removeEntity(character);
@@ -167,7 +199,18 @@
         var path;
         path = this.map.findPath([character.x, character.y], [x, y]);
         if (path.length === 0) {
-          console.log("Le personnage #" + character.id + " de type " + character.kind + " n'a pas trouvé de chemin jusque (" + x + ", " + y + ")");
+          path = this.map.findIncompletePath([character.x, character.y], [x, y]);
+          if (path.length === 0) {
+            console.log("Le personnage #" + character.id + " de type " + character.kind + " n'a pas trouvé de chemin jusque (" + x + ", " + y + ")");
+          } else {
+            console.log("Chemin incomplet");
+            console.log(JSON.parse(JSON.stringify(path)).length);
+            console.log(JSON.stringify(path));
+            console.log(path.length);
+            console.log(path);
+            console.log("1re entrée : " + path[0]);
+            console.log("/chemin incomplet");
+          }
         }
         return path;
       };

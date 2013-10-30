@@ -14,6 +14,9 @@
         this.moveStack = [];
         this.orientation = 'down';
         this.requestedPathCallback = null;
+        this.beforeNextStepCallback = null;
+        this.stepCallback = null;
+        this.deathCallback = null;
         this.currentMoveTimeout = null;
         this.mvmtInProgress = false;
         this.target = null;
@@ -32,6 +35,16 @@
 
       Character.prototype.follow = function(character) {
         return this.moveTo(character.x, character.y);
+      };
+
+      Character.prototype.recalculatePath = function() {
+        var destination;
+        console.log("Recalcul du chemin");
+        if (this.moveStack.length === 0) {
+          throw "Impossible de recalculer le chemin. Aucun mvmt en cours.";
+        }
+        destination = this.moveStack[this.moveStack.length - 1];
+        return this.moveTo(destination[0], destination[1]);
       };
 
       Character.prototype.setTarget = function(character) {
@@ -107,28 +120,33 @@
       };
 
       Character.prototype.setMoveStack = function(moveStack) {
+        console.log("Setmovestack avec (" + moveStack[0][0] + ", " + moveStack[0][1] + ") comme source");
         this.moveStack = moveStack;
         if (!this.mvmtInProgress) {
+          console.log("Pas de mouvement en cours, nextMove()");
           return this._nextMove();
         }
       };
 
       Character.prototype.abortMove = function() {
-        clearTimeout(this.currentMoveTimeout);
+        console.log(("AbortMove en (" + this.x + ", " + this.y + "). Timeout cleared : ") + this.currentMoveTimeout);
+        window.clearTimeout(this.currentMoveTimeout);
         return this.moveStack = [];
       };
 
       Character.prototype.move = function(x, y, callback) {
         var _this = this;
-        this.stepCallback();
         this.setPosition(x, y);
-        return this.currentMoveTimeout = setTimeout(function() {
+        this.currentMoveTimeout = window.setTimeout(function() {
+          console.log("Timeout just executed : " + _this.currentMoveTimeout);
           return callback();
-        }, 1000 / this.speed);
+        }, 1000);
+        return console.log("Timeout just set : " + this.currentMoveTimeout);
       };
 
       Character.prototype.moveTo = function(x, y) {
         var path;
+        console.log("MoveTo depuis (" + this.x + ", " + this.y + ") jsq (" + x + ", " + y + ")");
         path = this.requestedPathCallback(x, y);
         return this.setMoveStack(path);
       };
@@ -162,32 +180,6 @@
         });
       };
 
-      Character.prototype.enableSmoothMvmt = function() {
-        $(this.elt).addClass('smooth-mvmt');
-        Utils.setTransitionDuration(this.elt, 1 / this.speed);
-        return window.getComputedStyle(this.elt).getPropertyValue("left");
-      };
-
-      Character.prototype.disableSmoothMvmt = function() {
-        return $(this.elt).removeClass('smooth-mvmt');
-      };
-
-      Character.prototype.onRequestedPath = function(callback) {
-        return this.requestedPathCallback = callback;
-      };
-
-      Character.prototype.onStep = function(callback) {
-        return this.stepCallback = callback;
-      };
-
-      Character.prototype.onDeath = function(callback) {
-        return this.onDeathCallback = callback;
-      };
-
-      Character.prototype.idle = function() {
-        return this.setAnimation("idle_" + this.orientation);
-      };
-
       Character.prototype._nextMove = function() {
         var dest, direction, source,
           _this = this;
@@ -196,9 +188,10 @@
         }
         source = this.moveStack[0];
         dest = this.moveStack[1];
+        console.log("NextMove. moveStack actuel : " + JSON.stringify(this.moveStack));
         direction = null;
         if (source[0] !== this.x || source[1] !== this.y) {
-          throw "La source n'est pas la position actuelle du Character";
+          throw "La source (" + source[0] + ", " + source[1] + ") n'est pas la position actuelle du Character (" + this.x + ", " + this.y + ")";
         }
         if (Math.abs(source[0] - dest[0]) + Math.abs(source[1] - dest[1]) > 1) {
           throw "Il doit y avoir exactement une coordonnée changée de source à dest, x OU y";
@@ -215,9 +208,42 @@
           throw "Mouvement inconnu";
         }
         this.moveTowards(direction, function() {
+          _this.beforeNextStepCallback(_this.moveStack[1][0], _this.moveStack[1][1]);
           return _this._nextMove();
         });
+        this.stepCallback(source[0], source[1]);
         return this.moveStack.splice(0, 1);
+      };
+
+      Character.prototype.enableSmoothMvmt = function() {
+        $(this.elt).addClass('smooth-mvmt');
+        Utils.setTransitionDuration(this.elt, 1 / this.speed);
+        return window.getComputedStyle(this.elt).getPropertyValue("left");
+      };
+
+      Character.prototype.disableSmoothMvmt = function() {
+        return $(this.elt).removeClass('smooth-mvmt');
+      };
+
+      Character.prototype.onRequestedPath = function(callback) {
+        return this.requestedPathCallback = callback;
+      };
+
+      Character.prototype.onBeforeNextStep = function(callback) {
+        return this.beforeNextStepCallback = callback;
+      };
+
+      Character.prototype.onStep = function(callback) {
+        return this.stepCallback = callback;
+      };
+
+      Character.prototype.onDeath = function(callback) {
+        return this.onDeathCallback = callback;
+      };
+
+      Character.prototype.idle = function() {
+        console.log("idle");
+        return this.setAnimation("idle_" + this.orientation);
       };
 
       Character.prototype.remove = function() {

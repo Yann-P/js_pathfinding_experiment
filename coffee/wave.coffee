@@ -34,9 +34,9 @@ define [], () ->
 			zombie.moveTo(Math.floor(Math.random() * 29), Math.floor(Math.random() * 18))
 			@stack.splice(0, 1) 		# On enlève le zombie de la liste à spawner
 
-			@nextZombieTimeout = setTimeout( =>
+			@nextZombieTimeout = window.setTimeout( =>
 				@tick()
 			, @interval * 1000)
 
 		stop: ->
-			clearTimeout(@nextZombieTimeout)
+			window.clearTimeout(@nextZombieTimeout)

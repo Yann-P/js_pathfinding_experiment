@@ -4,8 +4,8 @@
   require.config({
     urlArgs: "v=" + Date.now(),
     paths: {
-      'jquery': 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min',
-      'astar': 'http://yann-p.fr/zombies/js/lib/astar'
+      'jquery': '/zombies/js/lib/jquery',
+      'astar': '/zombies/js/lib/astar'
     },
     shim: {
       'jquery': {
@@ -21,8 +21,7 @@
 
   define(['jquery', 'app'], function($, App) {
     return $(function() {
-      var app;
-      app = new App();
+      window.app = new App();
       app.center();
       app.switchView('loading');
       app.load(function() {

@@ -24,10 +24,10 @@ define ['data'], (Data) ->
 					@callback()
 				return @stop()
 
-			@currentTimeout = setTimeout(=>
+			@currentTimeout = window.setTimeout(=>
 				@tick()
 			, @interval)
 			
 		stop: ->
 			@ticks = 0
-			clearTimeout(@currentTimeout)
+			window.clearTimeout(@currentTimeout)

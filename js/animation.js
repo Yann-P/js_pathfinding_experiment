@@ -35,14 +35,14 @@
           }
           return this.stop();
         }
-        return this.currentTimeout = setTimeout(function() {
+        return this.currentTimeout = window.setTimeout(function() {
           return _this.tick();
         }, this.interval);
       };
 
       Animation.prototype.stop = function() {
         this.ticks = 0;
-        return clearTimeout(this.currentTimeout);
+        return window.clearTimeout(this.currentTimeout);
       };
 
       return Animation;

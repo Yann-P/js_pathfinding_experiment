@@ -43,13 +43,13 @@
         zombie = this.level.addZombie(14, 17, this.stack[0]);
         zombie.moveTo(Math.floor(Math.random() * 29), Math.floor(Math.random() * 18));
         this.stack.splice(0, 1);
-        return this.nextZombieTimeout = setTimeout(function() {
+        return this.nextZombieTimeout = window.setTimeout(function() {
           return _this.tick();
         }, this.interval * 1000);
       };
 
       Wave.prototype.stop = function() {
-        return clearTimeout(this.nextZombieTimeout);
+        return window.clearTimeout(this.nextZombieTimeout);
       };
 
       return Wave;

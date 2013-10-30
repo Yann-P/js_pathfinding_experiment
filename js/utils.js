@@ -3,7 +3,7 @@
 
   define([], function() {
     var Utils;
-    return Utils = {
+    Utils = {
       getRandomElement: function(obj) {
         return obj[Math.floor(Math.random() * obj.length)];
       },
@@ -12,8 +12,32 @@
         elt.style.WebkitTransitionDuration = duration + 's';
         elt.style.MozTransitionDuration = duration + 's';
         return elt.style.OTransitionDuration = duration + 's';
+      },
+      createDebugEntity: function(x, y, color, removeAfter, className) {
+        var $debug,
+          _this = this;
+        $debug = $('<div>').addClass('debug entity').css({
+          height: 32,
+          width: 32,
+          top: y * 32,
+          left: x * 32,
+          background: color,
+          opacity: 0.4
+        }).appendTo('#game');
+        if (className) {
+          $debug.attr('data-classname', className);
+        }
+        if (removeAfter !== -1) {
+          return setTimeout(function() {
+            return $debug.remove();
+          }, removeAfter);
+        }
+      },
+      removeDebugEntities: function(className) {
+        return $('.entity.debug[data-classname="' + className + '"]').remove();
       }
     };
+    return Utils;
   });
 
 }).call(this);
